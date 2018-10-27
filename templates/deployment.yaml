@@ -1,0 +1,51 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  namespace: {{ .Values.namespace }}      
+  name: {{ include "bitbucket.fullname" . }}
+  labels:
+    app: {{ include "bitbucket.name" . }}
+    chart: {{ include "bitbucket.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "bitbucket.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "bitbucket.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      volumes:
+        - name: bitbucket-vol
+          persistentVolumeClaim:
+            claimName: {{ default (include "bitbucket.fullname" .) }}-data
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+             - name: bitbucket-vol
+               mountPath: /var/atlassian/application-data/bitbucket
+          ports:
+            - name: bitbucket
+              containerPort: 7990
+              protocol: TCP
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
