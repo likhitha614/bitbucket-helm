@@ -14,7 +14,7 @@ spec:
     - port: {{ .Values.service.port }}
       targetPort: 7990
       protocol: TCP
-      name: 7990
+      name: http
   selector:
     app: {{ include "bitbucket.name" . }}
     release: {{ .Release.Name }}
