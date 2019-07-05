@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ default (include "teamcity.fullname" .) }}-data
+  name: {{ default (include "bitbucket.fullname" .) }}-data
   namespace: {{ .Values.namespace }}  
 spec:
   accessModes:
